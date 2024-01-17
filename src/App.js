@@ -31,6 +31,19 @@ function App() {
     });
   }
 
+  const update = ()=>{
+    Axios.put("http://localhost:3001/update",{
+      id:id,
+      nombre:nombre,
+      edad:edad,
+      pais:pais,
+      cargo:cargo,
+      anios:anios
+    }).then (()=>{
+      getEmpleados();
+    });
+  }
+
   const editarEmpleado =(val)=>{
       setEditar(true);
 
@@ -48,12 +61,10 @@ function App() {
       setEmpleados(response.data);
     });
 
-    
   }
 
   
-  
-  
+
 
 
   return (
@@ -130,7 +141,8 @@ function App() {
             <th scope="col">Experiencia</th>
             <th scope="col">Acciones</th>
             
-          </tr>
+          </tr> {}
+          
         </thead>
         <tbody>
          {
