@@ -1,13 +1,14 @@
 import './App.css';
-import { useState } from "react";
-import Axios from "axios";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { useState } from "react"; //
+import Axios from "axios"; //libreria js para realizar peticiones
+import 'bootstrap/dist/css/bootstrap.min.css'; //Framework CSS
+import Swal from 'sweetalert2'
 
 
 
 function App() {
-
-  const [nombre, setNombre] = useState ("");
+  // gestion de resultados  
+  const [nombre, setNombre] = useState (""); //
   const [edad, setEdad] = useState ();
   const [pais, setPais] = useState ("");
   const [cargo, setCargo] = useState ("");
@@ -16,7 +17,7 @@ function App() {
 
   const [editar, setEditar] = useState (false);
 
-  const [empleadosList,setEmpleados]= useState ([]);
+  const [empleadosList,setEmpleados]= useState ([]); //lista vacia
 
   const add = ()=>{
     Axios.post("http://localhost:3001/create",{
@@ -25,11 +26,46 @@ function App() {
       pais:pais,
       cargo:cargo,
       anios:anios
-    }).then (()=>{
+    }).then (()=>{  //luego de enviar los datos ejecutar la siguiente instruccion generar una alerta
       getEmpleados();
-      alert("empleado registrado")
+      limpiarCampos();
+      Swal.fire({
+        title: "<strong> Registro exitoso!! </strong>",
+        html: "<i>El empleado <strong>"+nombre+"</strong> fue registrado con exito!</i>",
+        icon: 'success',
+        timer: 3000,
+      });
+    }).catch(function(error){
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "No se logro registrar al empleado!",
+        footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)).message
+      });
+    })
+  }
+
+
+  const editarEmpleado =(val)=>{
+    setEditar(true);
+
+    setNombre(val.nombre);
+    setEdad(val.edad);
+    setPais(val.pais);
+    setCargo(val.cargo);
+    setAnios(val.anios);
+    setId(val.id);
+
+  }
+
+  //asigacion de datos en 
+  const getEmpleados =()=> {
+    Axios.get("http://localhost:3001/empleados").then((response)=>{ //cuando se tenga la respuesta almacenar la informacion en response
+      setEmpleados(response.data); //asignar los datos 
     });
   }
+
+
 
   const update = ()=>{
     Axios.put("http://localhost:3001/update",{
@@ -41,31 +77,74 @@ function App() {
       anios:anios
     }).then (()=>{
       getEmpleados();
-    });
+      limpiarCampos();
+      Swal.fire({
+        title: "<strong> Actualización exitosa!! </strong>",
+        html: "<i>El empleado <strong>"+nombre+"</strong> fue actualizado con exito!</i>",
+        icon: 'success',
+        timer: 3000,
+      });
+    }).catch(function(error){
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "No se logro actualizar el empleado!",
+        footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)).message
+      });
+    })
   }
-
-  const editarEmpleado =(val)=>{
-      setEditar(true);
-
-      setNombre(val.nombre);
-      setEdad(val.edad);
-      setPais(val.pais);
-      setCargo(val.cargo);
-      setAnios(val.anios);
-      setId(val.id);
-
-  }
-
-  const getEmpleados =()=> {
-    Axios.get("http://localhost:3001/empleados").then((response)=>{
-      setEmpleados(response.data);
-    });
-
-  }
-
   
 
+  const deleteEmpleado = (val)=>{
 
+    Swal.fire({
+      title: "Confirmar eliminado?",
+      html: "<i>Realmente desea elimnar a <strong>"+val.nombre+"</strong>?</i>",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "No",
+      confirmButtonText: "Si, eliminarlo!"
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+          Axios.delete(`http://localhost:3001/delete/${val.id}`).then (()=>{
+            getEmpleados();
+            limpiarCampos();
+            Swal.fire({
+              title: "Eliminado!",
+              text: val.nombre + ' fue eliminado',
+              icon: "success",
+              timer: 3000,
+              });
+            }).catch(function(error){
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "No se logro eliminar el empleado!",
+                footer: JSON.parse(JSON.stringify(error)).message==="Network Error"?"Intente más tarde":JSON.parse(JSON.stringify(error)).message
+              });
+            })
+            ;
+        
+        }
+    });
+
+  }
+
+  //borra los espacios una vez que se le de clic a los botones de registrar o actualizar 
+  const limpiarCampos = () =>{
+      setEditar(false);
+
+      setNombre("");
+      setEdad("");
+      setCargo("");
+      setPais("");
+      setAnios("");
+      setId("");
+  }
+  
 
   return (
     
@@ -78,8 +157,8 @@ function App() {
       <div className="card-body">
       <div className="input-group mb-3">
         <span className="input-group-text" id="basic-addon1">Nombre:</span>
-        <input type="text" onChange={(Event)=>{
-            setNombre(Event.target.value)
+        <input type="text" onChange={(Event)=>{ //event maneja la informacion en el campo capturado
+            setNombre(Event.target.value) // valor se asigna al campo setNombre
           }} className="form-control" value={nombre} placeholder="Ingrese un nombre" aria-label="Username" aria-describedby="basic-addon1">
         </input>
       </div>
@@ -119,16 +198,24 @@ function App() {
     
         <div className="card-footer text-muted">
 
-         
+           {
+              editar?
+              <div>
 
-          <button className='btn btn-success' onClick={add}>Registrar</button>
+              <button className='btn btn-warning m-2' onClick={update}>Actualizar</button> 
 
+              <button className='btn btn-info m-2' onClick={limpiarCampos}>Cancelar</button>
+
+              </div>
+              :<button className='btn btn-success' onClick={add}>Registrar</button>
+            }
+          
         </div>
 
-  
         </div>
       </div>
 
+      <button className='btn btn-warning m-2' onClick={getEmpleados}>Registros</button>
 
       <table className="table table-striped">
             <thead>
@@ -141,7 +228,7 @@ function App() {
             <th scope="col">Experiencia</th>
             <th scope="col">Acciones</th>
             
-          </tr> {}
+          </tr> 
           
         </thead>
         <tbody>
@@ -156,12 +243,18 @@ function App() {
                       <td>{val.anios}</td>
                       <td>
                       <div className="btn-group" role="group" aria-label="Basic example">
+
                         <button type="button" 
                         onClick={(Event)=>{
                           editarEmpleado(val);
                         }}
                         className="btn btn-info">Editar</button>
-                        <button type="button" className="btn btn-danger">Eliminar</button>
+
+                        <button type="button" onClick={()=> {
+                        deleteEmpleado(val);
+                        }}
+                        className="btn btn-danger">Eliminar</button>
+
                       </div>
                       </td>
                   </tr>
