@@ -20,7 +20,7 @@ function App() {
   const [empleadosList,setEmpleados]= useState ([]); //lista vacia
 
   const add = ()=>{
-    Axios.post("http://localhost:3001/create",{
+    Axios.post("https://jcalderon-crud-node.onrender.com/create",{
       nombre:nombre,
       edad:edad,
       pais:pais,
@@ -60,7 +60,7 @@ function App() {
 
   //asigacion de datos en 
   const getEmpleados =()=> {
-    Axios.get("http://localhost:3001/empleados").then((response)=>{ //cuando se tenga la respuesta almacenar la informacion en response
+    Axios.get("https://jcalderon-crud-node.onrender.com/empleados").then((response)=>{ //cuando se tenga la respuesta almacenar la informacion en response
       setEmpleados(response.data); //asignar los datos 
     });
   }
@@ -68,7 +68,7 @@ function App() {
 
 
   const update = ()=>{
-    Axios.put("http://localhost:3001/update",{
+    Axios.put("https://jcalderon-crud-node.onrender.com/update",{
       id:id,
       nombre:nombre,
       edad:edad,
@@ -109,7 +109,7 @@ function App() {
     }).then((result) => {
 
         if (result.isConfirmed) {
-          Axios.delete(`http://localhost:3001/delete/${val.id}`).then (()=>{
+          Axios.delete(`https://jcalderon-crud-node.onrender.com/delete/${val.id}`).then (()=>{
             getEmpleados();
             limpiarCampos();
             Swal.fire({
