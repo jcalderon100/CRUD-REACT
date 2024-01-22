@@ -4,8 +4,6 @@ import Axios from "axios"; //libreria js para realizar peticiones
 import 'bootstrap/dist/css/bootstrap.min.css'; //Framework CSS
 import Swal from 'sweetalert2'
 
-
-
 function App() {
   // gestion de resultados  
   const [nombre, setNombre] = useState (""); //
@@ -20,7 +18,7 @@ function App() {
   const [empleadosList,setEmpleados]= useState ([]); //lista vacia
 
   const add = ()=>{
-    Axios.post("https://jcalderon-crud-node.onrender.com/create",{
+    Axios.post("https://jcalderon-crud-nodejs-express-mysql.onrender.com/create",{
       nombre:nombre,
       edad:edad,
       pais:pais,
@@ -60,7 +58,7 @@ function App() {
 
   //asigacion de datos en 
   const getEmpleados =()=> {
-    Axios.get("https://jcalderon-crud-node.onrender.com/empleados").then((response)=>{ //cuando se tenga la respuesta almacenar la informacion en response
+    Axios.get("https://jcalderon-crud-nodejs-express-mysql.onrender.com/empleados").then((response)=>{ //cuando se tenga la respuesta almacenar la informacion en response
       setEmpleados(response.data); //asignar los datos 
     });
   }
@@ -68,7 +66,7 @@ function App() {
 
 
   const update = ()=>{
-    Axios.put("https://jcalderon-crud-node.onrender.com/update",{
+    Axios.put("https://jcalderon-crud-nodejs-express-mysql.onrender.com/update",{
       id:id,
       nombre:nombre,
       edad:edad,
@@ -109,7 +107,7 @@ function App() {
     }).then((result) => {
 
         if (result.isConfirmed) {
-          Axios.delete(`https://jcalderon-crud-node.onrender.com/delete/${val.id}`).then (()=>{
+          Axios.delete(`https://jcalderon-crud-nodejs-express-mysql.onrender.com/delete/${val.id}`).then (()=>{
             getEmpleados();
             limpiarCampos();
             Swal.fire({
